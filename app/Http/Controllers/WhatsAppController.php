@@ -15,7 +15,7 @@ class WhatsAppController extends Controller
         ]);
 
         $response = Http::post('http://localhost:3000/send-message', [
-            'number' => $validated['numero'],
+            'phone' => $validated['numero'],
             'message' => $validated['mensaje'],
         ]);
 
