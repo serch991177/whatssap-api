@@ -24,6 +24,9 @@ Route::post('/whatsapp/send-status', [WhatsAppController::class, 'sendWithStatus
 Route::post('/whatsapp/mark-read', [WhatsAppController::class, 'markAsRead']);
 Route::post('/whatsapp/received-message', [WhatsAppController::class, 'storeIncoming']);
 Route::get('/whatsapp/incoming', [WhatsAppController::class, 'incomingMessages']);
+Route::post('/whatsapp/envio-masivo-img-link', [WhatsAppController::class, 'enviarMasivoConImagen']);
+Route::post('/whatsapp/registrar-envio', [WhatsAppController::class, 'registrarResultado']);
+Route::post('/whatsapp/estado', [WhatsAppController::class, 'registrarEstado']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\WhatsAppLog;
 use App\Models\IncomingMessage;
+use App\Models\WhatsappEnvio;
+use App\Models\WhatsappEnvioLog;
+use App\Models\WhatsappEstados;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 
 class WhatsAppController extends Controller
@@ -195,13 +199,97 @@ class WhatsAppController extends Controller
     {
         return IncomingMessage::latest()->paginate(50);
     }
-
     public function reportes()
     {
         $logs = WhatsAppLog::latest()->paginate(50);
         return view('pages.icons', compact('logs'));
     }
 
+    public function enviarMasivoConImagen(Request $request)
+    {
+        try {
+            $request->validate([
+                'phones' => 'required|string',
+                'caption' => 'required|string',
+                'link' => 'required|string',
+                'file' => 'required|file|max:51200' // 50 MB
+            ]);
+            $phones = json_decode($request->phones, true);
+            if (!is_array($phones)) {
+                return response()->json(['error' => 'El campo phones debe ser un arreglo JSON válido.'], 422);
+            }
+            $response = Http::timeout(420)->attach(
+                'file',
+                file_get_contents($request->file('file')),
+                $request->file('file')->getClientOriginalName()
+            )->post("http://127.0.0.1:3000/send-bulk-messages-link-img", [
+                'phones' => json_encode($phones),
+                'message' => $request->caption,
+                'link' => $request->link
+            ]);
 
+            $filename = $request->file('file')->getClientOriginalName();
+            foreach ($phones as $index => $phone) {
+                WhatsappEnvio::create([
+                    'phone' => $phone,
+                    'caption' => $request->caption,
+                    'link' => $request->link,
+                    'media_filename' => $filename,
+                    'status' => $response->ok() && ($response['results'][$index]['success'] ?? false) ? 'enviado' : 'error',
+                    'response' => json_encode($response->json())
+                ]);
+            }
 
+            return response()->json($response->json(), $response->status());
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors()
+            ], 422);
+        }
+    }
+
+    public function registrarResultado(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'status' => 'required|string',
+            'caption' => 'nullable|string',
+            'link' => 'nullable|string',
+            'media_filename' => 'nullable|string',
+            'message_id' => 'nullable|string',
+            'response' => 'nullable|array'
+        ]);
+        WhatsappEnvioLog::create([
+            'phone' => $request->phone,
+            'status' => $request->status,
+            'caption' => $request->caption,
+            'link' => $request->link,
+            'media_filename' => $request->media_filename,
+            'message_id' => $request->message_id,
+            'response' => json_encode($request->response),
+        ]);
+        return response()->json(['success' => true]);
+    }
+
+    public function registrarEstado(Request $request)
+    {
+        $request->validate([
+            'message_id' => 'string',
+            'phone' => 'required|string',
+            'ack' => 'required|integer|min:0|max:3',
+            'timestamp' => 'nullable|integer'
+        ]);
+
+        WhatsappEstados::updateOrCreate(
+            ['message_id' => $request->message_id],
+            [
+                'phone' => $request->phone,
+                'ack' => $request->ack,
+                'estado_at' => $request->timestamp ? \Carbon\Carbon::createFromTimestampMs($request->timestamp) : now()
+            ]
+        );
+
+        return response()->json(['success' => true]);
+    }
 }
