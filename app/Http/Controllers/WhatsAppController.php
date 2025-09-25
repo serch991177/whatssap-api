@@ -201,10 +201,33 @@ class WhatsAppController extends Controller
     }
     public function reportes()
     {
-        $logs = WhatsAppLog::latest()->paginate(50);
-        return view('pages.icons', compact('logs'));
+        $logs = WhatsAppLog::get();
+        return view('pages.messagewhatsapp', compact('logs'));
     }
-
+    public function WhatsappEstados(){
+        $estados = WhatsappEstados::get();
+        $estadisticas = [
+            'pendientes' => $estados->where('ack', 0)->count(),
+            'enviados'   => $estados->where('ack', 1)->count(),
+            'entregados' => $estados->where('ack', 2)->count(),
+            'leidos'     => $estados->where('ack', 3)->count(),
+        ];
+        // mensajes agrupados por día
+        $porDia = $estados->groupBy(function($item) {
+            return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+        })->map->count();
+        // top 5 números
+        $topNumeros = $estados->groupBy('phone')->map->count()->sortDesc()->take(5);        
+        return view('pages.estadoswhatsapp', compact('estados','estadisticas','porDia','topNumeros'));
+    }
+    public function mensajesRespondidos(){
+        $estados = IncomingMessage::get();
+        return view('pages.mensajesrespondidos', compact('estados'));
+    }
+    public function estadoswhatsappreporte(){
+        $estados = WhatsappEstados::get();
+        return view('pages.estadoswhatsappreporte', compact('estados'));
+    }
     public function enviarMasivoConImagen(Request $request)
     {
         try {

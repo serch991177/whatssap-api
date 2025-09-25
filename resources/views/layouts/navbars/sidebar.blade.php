@@ -26,27 +26,45 @@
                                 <p>{{ _('User Profile') }}</p>
                             </a>
                         </li>
-                        <li @if ($pageSlug == 'users') class="active " @endif>
-                            <a href="{{ route('user.index')  }}">
-                                <i class="tim-icons icon-bullet-list-67"></i>
-                                <p>{{ _('User Management') }}</p>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a data-toggle="collapse" href="#estados-whatssap" aria-expanded="true">
+                    <i class="fab fa-laravel" ></i>
+                    <span class="nav-link-text" >{{ __('Estados Whatsapp') }}</span>
+                    <b class="caret mt-1"></b>
+                </a>
+                <div class="collapse show" id="estados-whatssap">
+                    <ul class="nav pl-4">
+                        <li @if ($pageSlug == 'Whatsapp State Messages') class="active " @endif>
+                            <a href="{{ route('pages.whatsapp.estados') }}">
+                                <i class="tim-icons icon-atom"></i>
+                                <p>{{ _('Mensajes Whatsapp') }}</p>
+                            </a>
+                        </li>
+                        <li @if ($pageSlug == 'Estados Whatsapp Reporte') class="active " @endif>
+                            <a href="{{ route('pages.estadoswhatsappreporte') }}">
+                                <i class="tim-icons icon-atom"></i>
+                                <p>{{ _('Reporte Global') }}</p>
                             </a>
                         </li>
                     </ul>
                 </div>
             </li>
-            <li @if ($pageSlug == 'icons') class="active " @endif>
-                <a href="{{ route('pages.icons') }}">
+            <li @if ($pageSlug == 'Whatsapp Messages') class="active " @endif>
+                <a href="{{ route('pages.whatsapp.messages') }}">
                     <i class="tim-icons icon-atom"></i>
-                    <p>{{ _('Formulario') }}</p>
+                    <p>{{ _('Mensajes Enviados') }}</p>
                 </a>
             </li>
-           
             
-            
-           
-           
-           
+            <li @if ($pageSlug == 'Whatsapp Incoming Messages') class="active " @endif>
+                <a href="{{ route('pages.mensajesrespondidos') }}">
+                    <i class="tim-icons icon-atom"></i>
+                    <p>{{ _('Mensajes Respondidos') }}</p>
+                </a>
+            </li>
         </ul>
     </div>
 </div>

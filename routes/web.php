@@ -34,20 +34,20 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Auth::routes();
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index']);
 
 Route::get('/home', 'App\Http\Controllers\HomeController@index')->name('home')->middleware('auth');
 
 Route::group(['middleware' => 'auth'], function () {
-		Route::get('icons', ['as' => 'pages.icons', 'uses' => 'App\Http\Controllers\WhatsAppController@reportes']);
-		Route::get('maps', ['as' => 'pages.maps', 'uses' => 'App\Http\Controllers\PageController@maps']);
-		Route::get('notifications', ['as' => 'pages.notifications', 'uses' => 'App\Http\Controllers\PageController@notifications']);
-		Route::get('rtl', ['as' => 'pages.rtl', 'uses' => 'App\Http\Controllers\PageController@rtl']);
-		Route::get('tables', ['as' => 'pages.tables', 'uses' => 'App\Http\Controllers\PageController@tables']);
-		Route::get('typography', ['as' => 'pages.typography', 'uses' => 'App\Http\Controllers\PageController@typography']);
-		Route::get('upgrade', ['as' => 'pages.upgrade', 'uses' => 'App\Http\Controllers\PageController@upgrade']);
-});
+	Route::get('whatsapp-messages', ['as' => 'pages.whatsapp.messages', 'uses' => 'App\Http\Controllers\WhatsAppController@reportes']);
+	Route::get('whatsapp-estados', ['as' => 'pages.whatsapp.estados', 'uses' => 'App\Http\Controllers\WhatsAppController@WhatsappEstados']);
+	Route::get('mensajesrespondidos', ['as' => 'pages.mensajesrespondidos', 'uses' => 'App\Http\Controllers\WhatsAppController@mensajesrespondidos']);
+	Route::get('reporte-whatsapp-estados', ['as' => 'pages.estadoswhatsappreporte', 'uses' => 'App\Http\Controllers\WhatsAppController@estadoswhatsappreporte']);
 
-Route::group(['middleware' => 'auth'], function () {
+
+	
+	Route::get('notifications', ['as' => 'pages.notifications', 'uses' => 'App\Http\Controllers\PageController@notifications']);
+	Route::get('typography', ['as' => 'pages.typography', 'uses' => 'App\Http\Controllers\PageController@typography']);
 	Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);
 	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'App\Http\Controllers\ProfileController@edit']);
 	Route::put('profile', ['as' => 'profile.update', 'uses' => 'App\Http\Controllers\ProfileController@update']);
