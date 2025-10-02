@@ -1,5 +1,20 @@
 @extends('layouts.app', ['page' => __('Whatsapp Messages'), 'pageSlug' => 'Whatsapp Messages'])
 @section('content')
+{{--Rango de Fechas--}}
+<div class="row mb-3">
+  <div class="col-md-12">
+    <form method="GET" action="{{ route('pages.whatsapp.messages') }}" class="form-inline">
+      <label for="start_date" class="mr-2">Desde:</label>
+      <input type="date" id="start_date" name="start_date" value="{{ request('start_date') }}" class="form-control mr-3">
+
+      <label for="end_date" class="mr-2">Hasta:</label>
+      <input type="date" id="end_date" name="end_date" value="{{ request('end_date') }}" class="form-control mr-3">
+
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+      <a href="{{ route('pages.whatsapp.messages') }}" class="btn btn-secondary ml-2">Limpiar</a>
+    </form>
+  </div>
+</div>
 <div class="row">
   <div class="col-md-12">
     <div class="card">

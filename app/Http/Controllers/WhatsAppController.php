@@ -199,16 +199,25 @@ class WhatsAppController extends Controller
     {
         return IncomingMessage::latest()->paginate(50);
     }
-    public function reportes(){
-        $logs = WhatsAppLog::get();
+    public function reportes(Request $request){
+        $query = WhatsAppLog::query();
+        // Filtros de fecha si llegan
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        }
+        $logs = $query->get();
         // Mensajes por día
-        $messagesByDay = WhatsAppLog::selectRaw('DATE(created_at) as date, COUNT(*) as total')->groupBy('date')->orderBy('date', 'asc')->pluck('total', 'date');
+        $messagesByDay = $query->clone()->selectRaw('DATE(created_at) as date, COUNT(*) as total')->groupBy('date')->orderBy('date', 'asc')->pluck('total', 'date');
         // Distribución por tipo
-        $messagesByType = WhatsAppLog::selectRaw('type, COUNT(*) as total')->groupBy('type')->pluck('total', 'type');
+        $messagesByType = $query->clone()->selectRaw('type, COUNT(*) as total')->groupBy('type')->pluck('total', 'type');
         // Top 5 teléfonos
-        $topPhones = WhatsAppLog::selectRaw('phone, COUNT(*) as total')->groupBy('phone')->orderByDesc('total')->limit(5)->pluck('total', 'phone');
+        $topPhones = $query->clone()->selectRaw('phone, COUNT(*) as total')->groupBy('phone')->orderByDesc('total')->limit(5)->pluck('total', 'phone');
         return view('pages.messagewhatsapp', compact('logs', 'messagesByDay', 'messagesByType', 'topPhones'));
     }
+
     public function WhatsappEstados(){
         $estados = WhatsappEstados::get();
         $estadisticas = [
