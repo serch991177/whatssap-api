@@ -199,10 +199,15 @@ class WhatsAppController extends Controller
     {
         return IncomingMessage::latest()->paginate(50);
     }
-    public function reportes()
-    {
+    public function reportes(){
         $logs = WhatsAppLog::get();
-        return view('pages.messagewhatsapp', compact('logs'));
+        // Mensajes por día
+        $messagesByDay = WhatsAppLog::selectRaw('DATE(created_at) as date, COUNT(*) as total')->groupBy('date')->orderBy('date', 'asc')->pluck('total', 'date');
+        // Distribución por tipo
+        $messagesByType = WhatsAppLog::selectRaw('type, COUNT(*) as total')->groupBy('type')->pluck('total', 'type');
+        // Top 5 teléfonos
+        $topPhones = WhatsAppLog::selectRaw('phone, COUNT(*) as total')->groupBy('phone')->orderByDesc('total')->limit(5)->pluck('total', 'phone');
+        return view('pages.messagewhatsapp', compact('logs', 'messagesByDay', 'messagesByType', 'topPhones'));
     }
     public function WhatsappEstados(){
         $estados = WhatsappEstados::get();
@@ -222,7 +227,13 @@ class WhatsAppController extends Controller
     }
     public function mensajesRespondidos(){
         $estados = IncomingMessage::get();
-        return view('pages.mensajesrespondidos', compact('estados'));
+        // 1. Mensajes por día
+        $messagesByDay = IncomingMessage::selectRaw('DATE(received_at) as date, COUNT(*) as total')->groupBy('date')->orderBy('date', 'asc')->pluck('total', 'date');
+        // 2. Top 5 números
+        $topSenders = IncomingMessage::selectRaw('"from", COUNT(*) as total')->groupBy('from')->orderByDesc('total')->limit(5)->pluck('total', 'from');
+        // 3. Mensajes por hora
+        $messagesByHour = IncomingMessage::selectRaw('EXTRACT(HOUR FROM received_at) as hour, COUNT(*) as total')->groupBy('hour')->orderBy('hour')->pluck('total', 'hour');
+        return view('pages.mensajesrespondidos', compact('estados', 'messagesByDay', 'topSenders', 'messagesByHour'));
     }
     public function estadoswhatsappreporte(){
         $estados = WhatsappEstados::get();
