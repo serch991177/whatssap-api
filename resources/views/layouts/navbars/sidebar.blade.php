@@ -66,8 +66,8 @@
                                 <p>{{ _('Mensajes Enviados') }}</p>
                             </a>
                         </li>
-                        <li @if ($pageSlug == 'Estados Whatsapp Reporte') class="active " @endif>
-                            <a href="{{ route('pages.estadoswhatsappreporte') }}">
+                        <li @if ($pageSlug == 'Estados Whatsapp Mensajes Reporte') class="active " @endif>
+                            <a href="{{ route('pages.mensajesenviadosdashboards') }}">
                                 <i class="tim-icons icon-atom"></i>
                                 <p>{{ _('Reporte Global') }}</p>
                             </a>

@@ -43,9 +43,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('whatsapp-estados', ['as' => 'pages.whatsapp.estados', 'uses' => 'App\Http\Controllers\WhatsAppController@WhatsappEstados']);
 	Route::get('mensajesrespondidos', ['as' => 'pages.mensajesrespondidos', 'uses' => 'App\Http\Controllers\WhatsAppController@mensajesrespondidos']);
 	Route::get('reporte-whatsapp-estados', ['as' => 'pages.estadoswhatsappreporte', 'uses' => 'App\Http\Controllers\WhatsAppController@estadoswhatsappreporte']);
+	Route::get('reporte-whatsapp-mensajes-enviados',['as'=>'pages.mensajesenviadosdashboards','uses'=>'App\Http\Controllers\WhatsAppController@dashboardWhatsappmensajesenviados']);
 
-
-	
 	Route::get('notifications', ['as' => 'pages.notifications', 'uses' => 'App\Http\Controllers\PageController@notifications']);
 	Route::get('typography', ['as' => 'pages.typography', 'uses' => 'App\Http\Controllers\PageController@typography']);
 	Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);

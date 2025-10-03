@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 
 class WhatsAppController extends Controller
@@ -216,6 +217,16 @@ class WhatsAppController extends Controller
         // Top 5 teléfonos
         $topPhones = $query->clone()->selectRaw('phone, COUNT(*) as total')->groupBy('phone')->orderByDesc('total')->limit(5)->pluck('total', 'phone');
         return view('pages.messagewhatsapp', compact('logs', 'messagesByDay', 'messagesByType', 'topPhones'));
+    }
+    public function dashboardWhatsappmensajesenviados(){
+        $totalMessages = WhatsAppLog::count();
+        $todayMessages = WhatsAppLog::whereDate('created_at', now()->toDateString())->count();
+        $uniqueTypes = WhatsAppLog::select('type')->distinct()->count();
+        $topPhone = WhatsAppLog::select('phone', DB::raw('COUNT(*) as total'))->groupBy('phone')->orderByDesc('total')->first();
+        $messagesByDay = WhatsAppLog::selectRaw('DATE(created_at) as date, COUNT(*) as total')->groupBy('date')->orderBy('date')->pluck('total', 'date');
+        $messagesByType = WhatsAppLog::selectRaw('type, COUNT(*) as total')->groupBy('type')->pluck('total', 'type');
+        $topPhones = WhatsAppLog::selectRaw('phone, COUNT(*) as total')->groupBy('phone')->orderByDesc('total')->limit(5)->pluck('total','phone');
+        return view('pages.dashboardmensajesenviados', compact('totalMessages','todayMessages','uniqueTypes','topPhone','messagesByDay','messagesByType','topPhones'));
     }
 
     public function WhatsappEstados(){
